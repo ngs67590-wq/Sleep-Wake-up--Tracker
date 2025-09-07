@@ -3,857 +3,220 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>作息記錄器</title>
+    <title>作息記錄器 - 測試版</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background-color: #ffffff;
-            color: #1f2937;
-            line-height: 1.6;
-        }
-        
-        .container {
-            max-width: 1200px;
+            font-family: Arial, sans-serif;
+            max-width: 800px;
             margin: 0 auto;
-            padding: 2rem 1rem;
+            padding: 20px;
+            background: #f5f5f5;
         }
-        
-        .title {
-            font-size: 2.5rem;
-            font-weight: bold;
-            text-align: center;
-            margin-bottom: 2rem;
-            color: #5D5CDE;
-        }
-        
-        .buttons {
-            display: flex;
-            justify-content: center;
-            gap: 0.5rem;
-            margin-bottom: 2rem;
-            flex-wrap: wrap;
-        }
-        
-        .btn {
-            padding: 0.75rem 1rem;
-            border: none;
-            border-radius: 0.5rem;
-            cursor: pointer;
-            font-size: 0.875rem;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-block;
-        }
-        
-        .btn-green { background: #10b981; color: white; }
-        .btn-blue { background: #3b82f6; color: white; }
-        .btn-purple { background: #8b5cf6; color: white; }
-        .btn-primary { background: #5D5CDE; color: white; }
-        .btn-red { background: #ef4444; color: white; }
-        .btn-gray { background: #6b7280; color: white; }
-        
-        .btn:hover {
-            opacity: 0.9;
-            transform: translateY(-1px);
-        }
-        
-        .tabs {
-            display: flex;
-            justify-content: center;
-            background: #f3f4f6;
-            border-radius: 0.5rem;
-            padding: 0.25rem;
-            margin-bottom: 2rem;
-            flex-wrap: wrap;
-        }
-        
-        .tab {
-            padding: 0.5rem 1rem;
-            border-radius: 0.375rem;
-            cursor: pointer;
-            font-size: 0.875rem;
-            transition: all 0.3s ease;
-            background: transparent;
-            border: none;
-            color: #6b7280;
-        }
-        
-        .tab.active {
-            background: #5D5CDE;
-            color: white;
-        }
-        
-        .view {
+        .card {
             background: white;
-            border-radius: 0.5rem;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-            padding: 1.5rem;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin: 20px 0;
         }
-        
-        .hidden {
-            display: none;
+        .success {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 4px solid #28a745;
+            margin: 20px 0;
+            font-weight: bold;
         }
-        
-        .calendar-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 1.5rem;
-        }
-        
-        .nav-btn {
-            padding: 0.5rem;
-            background: transparent;
+        button {
+            background: #007bff;
+            color: white;
             border: none;
-            border-radius: 0.5rem;
+            padding: 10px 20px;
+            border-radius: 5px;
             cursor: pointer;
-            transition: background 0.3s ease;
+            margin: 5px;
         }
-        
-        .nav-btn:hover {
-            background: #f3f4f6;
+        button:hover {
+            background: #0056b3;
         }
-        
-        .calendar-grid {
+        .calendar {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
-            gap: 0.25rem;
+            gap: 5px;
+            margin: 20px 0;
         }
-        
-        .calendar-header-cell {
-            text-align: center;
-            font-weight: 500;
-            padding: 0.5rem;
-            color: #6b7280;
-        }
-        
-        .calendar-cell {
+        .day {
             aspect-ratio: 1;
-            padding: 0.25rem;
-            border: 1px solid #e5e7eb;
+            border: 1px solid #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             cursor: pointer;
-            transition: all 0.3s ease;
-            border-radius: 0.25rem;
-            display: flex;
-            flex-direction: column;
-            position: relative;
-        }
-        
-        .calendar-cell:hover {
-            background: #f3f4f6;
-        }
-        
-        .calendar-cell.current-month {
-            color: #1f2937;
-        }
-        
-        .calendar-cell.other-month {
-            color: #9ca3af;
-        }
-        
-        .calendar-cell.today {
-            border: 2px solid #5D5CDE;
-        }
-        
-        .calendar-cell.has-wake {
-            background: #dbeafe;
-        }
-        
-        .calendar-cell.has-sleep {
-            background: #e9d5ff;
-        }
-        
-        .calendar-cell.has-both {
-            background: #d1fae5;
-        }
-        
-        .date-number {
-            font-size: 0.875rem;
-            font-weight: 500;
-        }
-        
-        .time-info {
-            font-size: 0.75rem;
-            margin-top: 0.25rem;
-            flex: 1;
-        }
-        
-        .wake-time {
-            color: #2563eb;
-        }
-        
-        .sleep-time {
-            color: #7c3aed;
-        }
-        
-        .legend {
-            display: flex;
-            justify-content: center;
-            gap: 1rem;
-            margin-top: 1.5rem;
-            flex-wrap: wrap;
-            font-size: 0.875rem;
-        }
-        
-        .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        
-        .legend-color {
-            width: 1rem;
-            height: 1rem;
-            border-radius: 0.25rem;
-        }
-        
-        .legend-blue { background: #3b82f6; }
-        .legend-purple { background: #8b5cf6; }
-        .legend-green { background: #10b981; }
-        
-        .modal {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 50;
-        }
-        
-        .modal-content {
-            background: white;
-            padding: 1.5rem;
-            border-radius: 0.5rem;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-            max-width: 28rem;
-            width: 100%;
-            margin: 1rem;
-        }
-        
-        .modal-title {
-            font-size: 1.125rem;
-            font-weight: 600;
-            margin-bottom: 1rem;
-            text-align: center;
-        }
-        
-        .form-group {
-            margin-bottom: 1rem;
-        }
-        
-        .form-label {
-            display: block;
-            font-size: 0.875rem;
-            font-weight: 500;
-            margin-bottom: 0.5rem;
-        }
-        
-        .form-row {
-            display: flex;
-            gap: 0.5rem;
-        }
-        
-        .form-select {
-            flex: 1;
-            padding: 0.5rem 0.75rem;
-            border: 1px solid #d1d5db;
-            border-radius: 0.5rem;
-            font-size: 1rem;
             background: white;
         }
-        
-        .form-select:focus {
-            outline: none;
-            border-color: #5D5CDE;
-            box-shadow: 0 0 0 3px rgba(93, 92, 222, 0.1);
+        .day:hover {
+            background: #e3f2fd;
         }
-        
-        .modal-buttons {
-            display: flex;
-            justify-content: flex-end;
-            gap: 0.75rem;
-            margin-top: 1.5rem;
-        }
-        
-        .notification {
-            position: fixed;
-            top: 1rem;
-            right: 1rem;
-            padding: 1rem;
-            border-radius: 0.5rem;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-            z-index: 50;
-            transition: all 0.3s ease;
-        }
-        
-        .notification.success {
-            background: #10b981;
-            color: white;
-        }
-        
-        .notification.error {
-            background: #ef4444;
-            color: white;
-        }
-        
-        .chart-container {
-            position: relative;
-            height: 400px;
-            background: #f9fafb;
-            border-radius: 0.5rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #6b7280;
-        }
-        
-        @media (max-width: 768px) {
-            .container {
-                padding: 1rem 0.5rem;
-            }
-            
-            .title {
-                font-size: 2rem;
-            }
-            
-            .buttons {
-                flex-direction: column;
-                align-items: center;
-            }
-            
-            .btn {
-                width: 100%;
-                max-width: 200px;
-            }
-            
-            .tabs {
-                flex-direction: column;
-            }
-            
-            .calendar-cell {
-                font-size: 0.75rem;
-            }
-            
-            .legend {
-                flex-direction: column;
-                align-items: center;
-            }
-        }
-        
-        .hidden-file {
-            display: none;
+        .has-data {
+            background: #c8e6c9 !important;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1 class="title">作息記錄器</h1>
-        
-        <!-- Export/Import Buttons -->
-        <div class="buttons">
-            <button id="exportJSON" class="btn btn-green">匯出 JSON</button>
-            <button id="exportCSV" class="btn btn-blue">匯出 CSV</button>
-            <input type="file" id="importFile" accept=".json,.csv" class="hidden-file">
-            <button id="importData" class="btn btn-purple">匯入數據</button>
-        </div>
-        
-        <!-- Navigation Tabs -->
-        <div class="tabs">
-            <button id="calendarTab" class="tab active">日曆記錄</button>
-            <button id="chartTab" class="tab">數據統計</button>
-        </div>
-
-        <!-- Calendar View -->
-        <div id="calendarView" class="view">
-            <div class="calendar-header">
-                <button id="prevMonth" class="nav-btn">
-                    &#8249;
-                </button>
-                <h2 id="currentMonth" class="text-xl font-semibold"></h2>
-                <button id="nextMonth" class="nav-btn">
-                    &#8250;
-                </button>
-            </div>
-
-            <div class="calendar-grid">
-                <div class="calendar-header-cell">日</div>
-                <div class="calendar-header-cell">一</div>
-                <div class="calendar-header-cell">二</div>
-                <div class="calendar-header-cell">三</div>
-                <div class="calendar-header-cell">四</div>
-                <div class="calendar-header-cell">五</div>
-                <div class="calendar-header-cell">六</div>
-            </div>
-            <div id="calendarGrid" class="calendar-grid"></div>
-
-            <div class="legend">
-                <div class="legend-item">
-                    <div class="legend-color legend-blue"></div>
-                    <span>起床時間</span>
-                </div>
-                <div class="legend-item">
-                    <div class="legend-color legend-purple"></div>
-                    <span>就寢時間</span>
-                </div>
-                <div class="legend-item">
-                    <div class="legend-color legend-green"></div>
-                    <span>兩者皆有</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Chart View -->
-        <div id="chartView" class="view hidden">
-            <h2 style="text-align: center; margin-bottom: 1rem;">數據統計</h2>
-            <div class="chart-container">
-                <div style="text-align: center;">
-                    <p style="font-size: 1.125rem; margin-bottom: 0.5rem;">📊 圖表功能</p>
-                    <p>當您有足夠的數據時，這裡會顯示睡眠趨勢圖表</p>
-                    <p style="margin-top: 0.5rem; font-size: 0.875rem;">開始記錄您的作息時間吧！</p>
-                </div>
-            </div>
-        </div>
+    <div class="success">
+        ✅ 應用程式已成功載入！新版本正在運行中...
     </div>
 
-    <!-- Time Input Modal -->
-    <div id="timeModal" class="modal hidden">
-        <div class="modal-content">
-            <h3 id="modalTitle" class="modal-title"></h3>
-            
-            <div class="form-group">
-                <label class="form-label">起床時間</label>
-                <div class="form-row">
-                    <select id="wakeUpHour" class="form-select">
-                        <option value="">時</option>
-                    </select>
-                    <select id="wakeUpMinute" class="form-select">
-                        <option value="">分</option>
-                    </select>
-                </div>
-            </div>
-            
-            <div class="form-group">
-                <label class="form-label">就寢時間</label>
-                <div class="form-row">
-                    <select id="sleepHour" class="form-select">
-                        <option value="">時</option>
-                    </select>
-                    <select id="sleepMinute" class="form-select">
-                        <option value="">分</option>
-                    </select>
-                </div>
-            </div>
+    <div class="card">
+        <h1 style="text-align: center; color: #5D5CDE; margin: 0;">🌙 作息記錄器 🌅</h1>
+        <p style="text-align: center; color: #666; margin: 10px 0;">版本: 2.0 - 自包含版本</p>
+    </div>
 
-            <div class="modal-buttons">
-                <button id="cancelModal" class="btn btn-gray">取消</button>
-                <button id="clearData" class="btn btn-red">清除</button>
-                <button id="saveData" class="btn btn-primary">保存</button>
-            </div>
+    <div class="card">
+        <h2>📅 日曆</h2>
+        <div style="text-align: center; margin: 20px 0;">
+            <button onclick="changeMonth(-1)">← 上個月</button>
+            <span id="monthDisplay" style="margin: 0 20px; font-weight: bold;"></span>
+            <button onclick="changeMonth(1)">下個月 →</button>
         </div>
+        
+        <div class="calendar" id="calendar"></div>
+        
+        <p style="color: #666; font-size: 14px;">
+            💡 點擊日期來記錄起床和就寢時間
+        </p>
+    </div>
+
+    <div class="card">
+        <h2>🔧 功能測試</h2>
+        <button onclick="testAlert()">測試通知</button>
+        <button onclick="testDownload()">測試下載</button>
+        <button onclick="testStorage()">測試存儲</button>
+        <div id="testResults" style="margin-top: 15px;"></div>
+    </div>
+
+    <div class="card">
+        <h2>📊 統計</h2>
+        <p>已記錄天數: <span id="recordCount">0</span> 天</p>
+        <p>最近記錄: <span id="lastRecord">無</span></p>
     </div>
 
     <script>
-        // 全局變數
-        let sleepData = {};
+        console.log('🚀 作息記錄器 v2.0 啟動成功！');
+        
+        let sleepData = JSON.parse(localStorage.getItem('sleepData') || '{}');
         let currentDate = new Date();
-        let db = null;
 
-        // 工具函數
-        function formatDate(date) {
-            return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+        function updateDisplay() {
+            document.getElementById('monthDisplay').textContent = 
+                `${currentDate.getFullYear()}年 ${currentDate.getMonth() + 1}月`;
+            
+            document.getElementById('recordCount').textContent = Object.keys(sleepData).length;
+            
+            const dates = Object.keys(sleepData).sort();
+            document.getElementById('lastRecord').textContent = 
+                dates.length > 0 ? dates[dates.length - 1] : '無';
         }
 
-        // 初始化時間選擇器
-        function initializeTimeSelects() {
-            const hourSelects = ['wakeUpHour', 'sleepHour'];
-            hourSelects.forEach(selectId => {
-                const select = document.getElementById(selectId);
-                for (let i = 0; i < 24; i++) {
-                    const option = document.createElement('option');
-                    option.value = String(i).padStart(2, '0');
-                    option.textContent = String(i).padStart(2, '0') + '時';
-                    select.appendChild(option);
-                }
-            });
-
-            const minuteSelects = ['wakeUpMinute', 'sleepMinute'];
-            minuteSelects.forEach(selectId => {
-                const select = document.getElementById(selectId);
-                for (let i = 0; i < 60; i++) {
-                    const option = document.createElement('option');
-                    option.value = String(i).padStart(2, '0');
-                    option.textContent = String(i).padStart(2, '0') + '分';
-                    select.appendChild(option);
-                }
-            });
-        }
-
-        // 日曆渲染
         function renderCalendar() {
+            const calendar = document.getElementById('calendar');
+            calendar.innerHTML = '';
+            
             const year = currentDate.getFullYear();
             const month = currentDate.getMonth();
-            
-            document.getElementById('currentMonth').textContent = 
-                `${year}年 ${month + 1}月`;
-
             const firstDay = new Date(year, month, 1);
-            const startDate = new Date(firstDay);
-            startDate.setDate(startDate.getDate() - firstDay.getDay());
-
-            const calendarGrid = document.getElementById('calendarGrid');
-            calendarGrid.innerHTML = '';
-
-            for (let i = 0; i < 42; i++) {
-                const cellDate = new Date(startDate);
-                cellDate.setDate(startDate.getDate() + i);
-                
-                const dateStr = formatDate(cellDate);
-                const isCurrentMonth = cellDate.getMonth() === month;
-                const isToday = cellDate.toDateString() === new Date().toDateString();
-                const data = sleepData[dateStr];
-
-                const cell = document.createElement('div');
-                cell.className = 'calendar-cell';
-                
-                if (isCurrentMonth) {
-                    cell.className += ' current-month';
-                } else {
-                    cell.className += ' other-month';
-                }
-                
-                if (isToday) {
-                    cell.className += ' today';
-                }
-                
-                if (data) {
-                    if (data.wakeUp && data.sleep) {
-                        cell.className += ' has-both';
-                    } else if (data.wakeUp) {
-                        cell.className += ' has-wake';
-                    } else if (data.sleep) {
-                        cell.className += ' has-sleep';
-                    }
-                }
-
-                cell.innerHTML = `
-                    <div class="date-number">${cellDate.getDate()}</div>
-                    <div class="time-info">
-                        ${data?.wakeUp ? `<div class="wake-time">起 ${data.wakeUp}</div>` : ''}
-                        ${data?.sleep ? `<div class="sleep-time">寢 ${data.sleep}</div>` : ''}
-                    </div>
-                `;
-
-                cell.addEventListener('click', () => openTimeModal(cellDate));
-                calendarGrid.appendChild(cell);
-            }
-        }
-
-        // 模態框操作
-        function openTimeModal(date) {
-            const dateStr = formatDate(date);
-            const data = sleepData[dateStr] || {};
+            const lastDay = new Date(year, month + 1, 0);
             
-            document.getElementById('modalTitle').textContent = 
-                `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日`;
+            // 週標題
+            ['日', '一', '二', '三', '四', '五', '六'].forEach(day => {
+                const div = document.createElement('div');
+                div.textContent = day;
+                div.style.fontWeight = 'bold';
+                div.style.textAlign = 'center';
+                div.style.background = '#f8f9fa';
+                calendar.appendChild(div);
+            });
             
-            if (data.wakeUp) {
-                const [hour, minute] = data.wakeUp.split(':');
-                document.getElementById('wakeUpHour').value = hour;
-                document.getElementById('wakeUpMinute').value = minute;
-            } else {
-                document.getElementById('wakeUpHour').value = '';
-                document.getElementById('wakeUpMinute').value = '';
+            // 空白天數
+            for (let i = 0; i < firstDay.getDay(); i++) {
+                calendar.appendChild(document.createElement('div'));
             }
             
-            if (data.sleep) {
-                const [hour, minute] = data.sleep.split(':');
-                document.getElementById('sleepHour').value = hour;
-                document.getElementById('sleepMinute').value = minute;
-            } else {
-                document.getElementById('sleepHour').value = '';
-                document.getElementById('sleepMinute').value = '';
+            // 日期
+            for (let day = 1; day <= lastDay.getDate(); day++) {
+                const div = document.createElement('div');
+                div.className = 'day';
+                div.textContent = day;
+                
+                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                if (sleepData[dateStr]) {
+                    div.className += ' has-data';
+                }
+                
+                div.onclick = () => recordTime(dateStr, day);
+                calendar.appendChild(div);
             }
             
-            document.getElementById('timeModal').classList.remove('hidden');
-            document.getElementById('timeModal').dataset.date = dateStr;
+            updateDisplay();
         }
 
-        function closeTimeModal() {
-            document.getElementById('timeModal').classList.add('hidden');
+        function changeMonth(direction) {
+            currentDate.setMonth(currentDate.getMonth() + direction);
+            renderCalendar();
         }
 
-        function saveTimeData() {
-            const dateStr = document.getElementById('timeModal').dataset.date;
+        function recordTime(dateStr, day) {
+            const wakeUp = prompt(`${day}日 - 請輸入起床時間 (例如: 07:30):`);
+            const sleep = prompt(`${day}日 - 請輸入就寢時間 (例如: 23:30):`);
             
-            const wakeUpHour = document.getElementById('wakeUpHour').value;
-            const wakeUpMinute = document.getElementById('wakeUpMinute').value;
-            const wakeUp = (wakeUpHour && wakeUpMinute) ? `${wakeUpHour}:${wakeUpMinute}` : '';
-            
-            const sleepHour = document.getElementById('sleepHour').value;
-            const sleepMinute = document.getElementById('sleepMinute').value;
-            const sleep = (sleepHour && sleepMinute) ? `${sleepHour}:${sleepMinute}` : '';
-
             if (wakeUp || sleep) {
                 sleepData[dateStr] = {};
                 if (wakeUp) sleepData[dateStr].wakeUp = wakeUp;
                 if (sleep) sleepData[dateStr].sleep = sleep;
-            } else {
-                delete sleepData[dateStr];
-            }
-
-            saveDataToDB();
-            renderCalendar();
-            closeTimeModal();
-        }
-
-        function clearTimeData() {
-            const dateStr = document.getElementById('timeModal').dataset.date;
-            delete sleepData[dateStr];
-            saveDataToDB();
-            renderCalendar();
-            closeTimeModal();
-        }
-
-        // 頁籤切換
-        function showView(viewId) {
-            document.querySelectorAll('.view').forEach(view => {
-                view.classList.add('hidden');
-            });
-            document.querySelectorAll('.tab').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            
-            document.getElementById(viewId).classList.remove('hidden');
-            
-            if (viewId === 'calendarView') {
-                document.getElementById('calendarTab').classList.add('active');
-            } else {
-                document.getElementById('chartTab').classList.add('active');
-            }
-        }
-
-        // 匯出功能
-        function exportToJSON() {
-            const dataToExport = {
-                exportDate: new Date().toISOString(),
-                sleepData: sleepData
-            };
-            
-            const blob = new Blob([JSON.stringify(dataToExport, null, 2)], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `sleep-data-${new Date().toISOString().split('T')[0]}.json`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-        }
-
-        function exportToCSV() {
-            let csvContent = 'Date,Wake Up Time,Sleep Time\n';
-            
-            const sortedDates = Object.keys(sleepData).sort();
-            
-            for (const date of sortedDates) {
-                const data = sleepData[date];
-                csvContent += `${date},${data.wakeUp || ''},${data.sleep || ''}\n`;
-            }
-            
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `sleep-data-${new Date().toISOString().split('T')[0]}.csv`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-        }
-
-        function importData() {
-            document.getElementById('importFile').click();
-        }
-
-        function handleFileImport(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const content = e.target.result;
-                    
-                    if (file.name.endsWith('.json')) {
-                        const importedData = JSON.parse(content);
-                        if (importedData.sleepData) {
-                            sleepData = { ...sleepData, ...importedData.sleepData };
-                            showNotification(`成功匯入 ${Object.keys(importedData.sleepData).length} 筆記錄`, 'success');
-                        } else {
-                            showNotification('JSON 檔案格式不正確', 'error');
-                        }
-                    } else if (file.name.endsWith('.csv')) {
-                        const lines = content.split('\n');
-                        let importCount = 0;
-                        
-                        for (let i = 1; i < lines.length; i++) {
-                            const line = lines[i].trim();
-                            if (!line) continue;
-                            
-                            const [date, wakeUp, sleep] = line.split(',');
-                            if (date && (wakeUp || sleep)) {
-                                sleepData[date] = {};
-                                if (wakeUp) sleepData[date].wakeUp = wakeUp;
-                                if (sleep) sleepData[date].sleep = sleep;
-                                importCount++;
-                            }
-                        }
-                        
-                        if (importCount > 0) {
-                            showNotification(`成功匯入 ${importCount} 筆記錄`, 'success');
-                        } else {
-                            showNotification('CSV 檔案中沒有有效的數據', 'error');
-                        }
-                    }
-                    
-                    saveDataToDB();
-                    renderCalendar();
-                    
-                } catch (error) {
-                    showNotification('檔案格式錯誤或內容無效', 'error');
-                }
-            };
-            
-            reader.readAsText(file);
-            event.target.value = '';
-        }
-
-        // 通知功能
-        function showNotification(message, type) {
-            const notification = document.createElement('div');
-            notification.className = `notification ${type}`;
-            notification.textContent = message;
-            
-            document.body.appendChild(notification);
-            
-            setTimeout(() => {
-                notification.style.opacity = '0';
-                setTimeout(() => {
-                    if (document.body.contains(notification)) {
-                        document.body.removeChild(notification);
-                    }
-                }, 300);
-            }, 3000);
-        }
-
-        // IndexedDB 功能
-        function initializeDatabase() {
-            const request = indexedDB.open('SleepTrackerDB', 1);
-            
-            request.onerror = function(event) {
-                console.log('數據庫打開失敗，使用內存存儲');
-            };
-            
-            request.onsuccess = function(event) {
-                db = event.target.result;
-                loadDataFromDB();
-            };
-            
-            request.onupgradeneeded = function(event) {
-                db = event.target.result;
                 
-                if (!db.objectStoreNames.contains('sleepData')) {
-                    const objectStore = db.createObjectStore('sleepData', { keyPath: 'date' });
-                    objectStore.createIndex('date', 'date', { unique: true });
-                }
-            };
-        }
-
-        function saveDataToDB() {
-            if (!db) return;
-            
-            const transaction = db.transaction(['sleepData'], 'readwrite');
-            const objectStore = transaction.objectStore('sleepData');
-            
-            objectStore.clear();
-            
-            Object.entries(sleepData).forEach(([date, data]) => {
-                objectStore.add({
-                    date: date,
-                    wakeUp: data.wakeUp || null,
-                    sleep: data.sleep || null
-                });
-            });
-        }
-
-        function loadDataFromDB() {
-            if (!db) return;
-            
-            const transaction = db.transaction(['sleepData'], 'readonly');
-            const objectStore = transaction.objectStore('sleepData');
-            const request = objectStore.getAll();
-            
-            request.onsuccess = function(event) {
-                const records = event.target.result;
-                sleepData = {};
-                
-                records.forEach(record => {
-                    sleepData[record.date] = {};
-                    if (record.wakeUp) sleepData[record.date].wakeUp = record.wakeUp;
-                    if (record.sleep) sleepData[record.date].sleep = record.sleep;
-                });
-                
+                localStorage.setItem('sleepData', JSON.stringify(sleepData));
                 renderCalendar();
                 
-                if (records.length > 0) {
-                    showNotification(`已載入 ${records.length} 筆本地記錄`, 'success');
-                }
-            };
+                alert('✅ 數據已保存！');
+            }
         }
 
-        // 事件監聽器
-        document.getElementById('prevMonth').addEventListener('click', () => {
-            currentDate.setMonth(currentDate.getMonth() - 1);
-            renderCalendar();
-        });
+        function testAlert() {
+            const result = document.getElementById('testResults');
+            result.innerHTML = '<div style="color: green;">✅ 通知功能正常</div>';
+        }
 
-        document.getElementById('nextMonth').addEventListener('click', () => {
-            currentDate.setMonth(currentDate.getMonth() + 1);
-            renderCalendar();
-        });
+        function testDownload() {
+            const blob = new Blob(['測試下載檔案'], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'test.txt';
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            const result = document.getElementById('testResults');
+            result.innerHTML = '<div style="color: green;">✅ 下載功能正常</div>';
+        }
 
-        document.getElementById('calendarTab').addEventListener('click', () => showView('calendarView'));
-        document.getElementById('chartTab').addEventListener('click', () => showView('chartView'));
-
-        document.getElementById('cancelModal').addEventListener('click', closeTimeModal);
-        document.getElementById('saveData').addEventListener('click', saveTimeData);
-        document.getElementById('clearData').addEventListener('click', clearTimeData);
-
-        document.getElementById('exportJSON').addEventListener('click', exportToJSON);
-        document.getElementById('exportCSV').addEventListener('click', exportToCSV);
-        document.getElementById('importData').addEventListener('click', importData);
-        document.getElementById('importFile').addEventListener('change', handleFileImport);
-
-        // 點擊模態框外部關閉
-        document.getElementById('timeModal').addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeTimeModal();
+        function testStorage() {
+            try {
+                localStorage.setItem('test', 'ok');
+                localStorage.removeItem('test');
+                const result = document.getElementById('testResults');
+                result.innerHTML = '<div style="color: green;">✅ 存儲功能正常</div>';
+            } catch (e) {
+                const result = document.getElementById('testResults');
+                result.innerHTML = '<div style="color: red;">❌ 存儲功能異常</div>';
             }
-        });
+        }
 
         // 初始化
-        initializeTimeSelects();
-        initializeDatabase();
         renderCalendar();
         
-        console.log('作息記錄器載入完成！');
+        console.log('📱 應用程式準備就緒！');
+        console.log('📝 已載入數據:', Object.keys(sleepData).length, '筆記錄');
     </script>
 </body>
 </html>
